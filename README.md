@@ -54,4 +54,6 @@ Make sure that your Python version is 3.7 or higher by checking your via the `py
 
 We do not recommend this approach since Python is quite known for its frustrating dependency management (see [here](https://medium.com/knerd/the-nine-circles-of-python-dependency-hell-481d53e3e025) for example).
 
+---
+
 It is furthermore noteworthy that the Strava API is limited to 100 requests every 15 minutes and 1000 requests per day, thus it could become a problem if you want to import a lot of activities at once.
