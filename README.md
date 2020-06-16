@@ -16,13 +16,13 @@ https://www.strava.com/oauth/authorize?client_id=[CLIENT_ID]&response_type=code&
 
 
 
-After visiting this URL and clicking the "Authorize" button, you should be redirected to your *Authorization Callback Domain*, in our case `localhost:8080`. The URL should contain a parameter `code`, which you should copy and a parameter scope, which should be `scope=read,activity:write`. This code can now be used to obtain a temporary access token, which can be done as follows (we are using [httpie](https://httpie.org/)):
+After visiting this URL and clicking the "Authorize" button, you should be redirected to your *Authorization Callback Domain*, in our case `localhost:8080`. The URL should contain a `code` parameter and a parameter scope, which should be `scope=read,activity:write`. The code is required to obtain a temporary access token, which can be done as follows (we are using [httpie](https://httpie.org/)):
 
 ```
 $ http POST https://www.strava.com/api/v3/oauth/token client_id=[CLIENT_ID] client_secret=[CLIENT_SECRET] code=[CODE] grant_type=authorization_code
 ```
 
-The returned `JSON` response contains an access token, its expiration information and the athlete's data. This access token can now be used to make calls to the Strava API.
+The returned `json` response contains an access token, its expiration information and the athlete's data. This access token can now be used to make calls to the Strava API.
 
 While it is possible to use our tool with "plain" python, we strongly recommend using [Docker](https://www.docker.com/). In both cases you have to clone this repository using `git clone https://github.com/matthiasweiss/runtastic-strava-migrate` and subsequently copy the aforementioned `./Sport-sessions` folder, which is part of the personal data you are able to export from Runtastic, into the repository's root. After copying the files into the cloned repository, listing all files within the directory using `ls` should yield something like this:
 
@@ -40,7 +40,7 @@ requirements.txt
 
 ### Using Docker (recommended):
 
-We've prepared a script that builds the necessary image, migrates your data and subsequently removes the image again. It is sufficient to run the following two commands (`ACCESS_TOKEN` is the access token that was obtained earlier):
+We've prepared a script that builds the necessary image, migrates your data and removes the image after the script is done migrating. It is sufficient to run the following two commands (`ACCESS_TOKEN` is the access token that was obtained earlier):
 
 ```
 $ chmod +x docker_migrate.sh
