@@ -8,12 +8,10 @@ To start you'll need to export your personal data from the runtastic, which can 
 
 Once your data is available, you should receive an email that contains a link to a `zip` archive, which you have to download. Once you extract this archive you should see a couple of folders inside the extracted archive, the important one being `./Sport-sessions`, which contains one `json` file per activity that you have completed (or added manually) in Runtastic. Once you have access to those `json` files you are able to continue with the actual process of migrating the activities to Strava.
 
-To start, you'll need to create a Strava API Application through the [Strava settings](https://www.strava.com/settings/api). The website field during the creation of the application can be arbitrary, the *Authorization Callback Domain* should point to your `localhost`, we have chosen `localhost:8080` since nothing is running on this port on our machines. Once this is done, you have to request an authorization code with write permissions (since you want to create new activites through the API), which can be done by copying the link address of your *OAuth Authorization page*, a link to this page is on the bottom part of the [API settings page](https://developers.strava.com/docs/authentication/) and appending the query parameter `&scope=activity:write`, resulting in a URL that should look something like this: 
+To start, you'll need to create a Strava API Application through the [Strava settings](https://www.strava.com/settings/api). The website field during the creation of the application can be arbitrary, the *Authorization Callback Domain* should point to your `localhost`, we have chosen `localhost:8080` since nothing is running on this port on our machines. Once this is done, you have to request an authorization code with write permissions (since you want to create new activites through the API), which can be done by copying the link address of your *OAuth Authorization page*, a link to this page is on the bottom part of the [API settings page](https://developers.strava.com/docs/authentication/) and appending the query parameter `&scope=activity:write`, resulting in a URL that should look something like this:
 
 ```
-https://www.strava.com/oauth/authorize?client_id=[CLIENT_ID]
-	&response_type=code&redirect_uri=http://localhost:8080
-	&approval_prompt=force&scope=activity:write
+https://www.strava.com/oauth/authorize?client_id=[CLIENT_ID]&response_type=code&redirect_uri=http://localhost:8080&approval_prompt=force&scope=activity:write
 ```
 
 
@@ -21,10 +19,7 @@ https://www.strava.com/oauth/authorize?client_id=[CLIENT_ID]
 After visiting this URL and clicking the "Authorize" button, you should be redirected to your *Authorization Callback Domain*, in our case `localhost:8080`. The URL should contain a parameter `code`, which you should copy and a parameter scope, which should be `scope=read,activity:write`. This code can now be used to obtain a temporary access token, which can be done as follows (we are using [httpie](https://httpie.org/)):
 
 ```
-$ http POST https://www.strava.com/api/v3/oauth/token client_id=[CLIENT_ID]
-	client_secret=[CLIENT_SECRET]
-	code=[CODE] 
-	grant_type=authorization_code
+$ http POST https://www.strava.com/api/v3/oauth/token client_id=[CLIENT_ID] client_secret=[CLIENT_SECRET] code=[CODE] grant_type=authorization_code
 ```
 
 The returned `JSON` response contains an access token, its expiration information and the athlete's data. This access token can now be used to make calls to the Strava API.
