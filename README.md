@@ -22,7 +22,7 @@ After visiting this URL and clicking the "Authorize" button, you should be redir
 $ http POST https://www.strava.com/api/v3/oauth/token client_id=[CLIENT_ID] client_secret=[CLIENT_SECRET] code=[CODE] grant_type=authorization_code
 ```
 
-The returned `json` response contains an access token, its expiration information and the athlete's data. This access token can now be used to make calls to the Strava API.
+The returned `json` response contains an access token, its expiration information and the athlete's data. This access token can now be used to make calls to the Strava API. The access token expires [six hours](https://developers.strava.com/docs/authentication/#:~:text=six%20hours) after its creation, so make sure you start your migration within that timespan. Otherwise you have to redo the above steps to get a new access token. 
 
 While it is possible to use our tool with "plain" python, we strongly recommend using [Docker](https://www.docker.com/). In both cases you have to clone this repository using `git clone https://github.com/matthiasweiss/runtastic-strava-migrate` and subsequently copy the aforementioned `./Sport-sessions` folder, which is part of the personal data you are able to export from Runtastic, into the repository's root. After copying the files into the cloned repository, listing all files within the directory using `ls` should yield something like this:
 
