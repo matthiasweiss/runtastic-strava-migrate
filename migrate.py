@@ -43,6 +43,26 @@ def strava_activity_type(runtastic_type_id):
     }.get(int(runtastic_type_id), run)
 
 
+def metersPerSecondToKmPerHour(metersPerSecond):
+    # km/h to m/s
+    # 1m/s = (1km/1000) / (1h/(60*60))
+    # m/s * 3.6 = km/h
+    kilometersPerHour = float(metersPerSecond)*3.6
+    return f'{kilometersPerHour:2.2f}'
+
+def convertToMinPerKm(secondsPerMeter):
+    secondsPerKilometer = float(secondsPerMeter) * 1000
+    return convertMinutesToFormattedString(secondsPerKilometer)
+
+def convertToSeconds(milliseconds):
+    seconds = milliseconds/1000
+    return convertMinutesToFormattedString(seconds)
+
+def convertMinutesToFormattedString(seconds):
+    min = int(seconds/60)
+    seconds = int(seconds%60)
+    return f'{min:02d}:{seconds:02d}'
+
 # map runtastic data to strava API request and make API call
 def import_activity(counter, activity):
     activity_type = strava_activity_type(activity['sport_type_id'])
@@ -61,21 +81,17 @@ def import_activity(counter, activity):
                 "start_date_local": activity_date + "Z",
                 "elapsed_time": int(int(activity["duration"]) / 1000),
                 "distance": int(feature["attributes"]["distance"]),
-                "description": "Feeling: " + feeling + ""
-                                                                   ", average pace: " + str(
-                    feature["attributes"]["average_pace"]) + " ?(min/km)" # The unit of measurement is not clear
-                                                             ", max. speed: " + str(
-                    feature["attributes"]["max_speed"]) + " ?(min/km)" # The unit of measurement is not clear
-                                                          ", elevation gain: " + str(
-                    feature["attributes"]["elevation_gain"]) + " m"
-                                                               ", elevation loss: " + str(
-                    feature["attributes"]["elevation_loss"]) + " m"
-                                                               ", pause: " + str(
-                    int(activity["pause"]) / 1000 / 60) + " minutes"
-                                                          ", calories: " + str(activity["calories"])
+                "description": "Feeling: " + feeling
+                + ", average pace: " + convertToMinPerKm(feature["attributes"]["average_pace"]) + " min/km"
+                + ", average speed: " + metersPerSecondToKmPerHour(feature["attributes"]["average_speed"]) + " km/h"
+                + ", max. speed: " + metersPerSecondToKmPerHour(feature["attributes"]["max_speed"]) + " km/h"
+                + ", elevation gain: " + str(feature["attributes"]["elevation_gain"]) + " m"
+                + ", elevation loss: " + str(feature["attributes"]["elevation_loss"]) + " m"
+                + ", pause: " + convertToSeconds(activity["pause"])
+                + ", calories: " + str(activity["calories"])
             }
             # INFO: For debugging purposes
-            # print("[#{}] Request data: {}".format(count, data))
+            # print("[#{}] Request data: {}".format(counter, data))
         else:
             continue
 
@@ -99,5 +115,7 @@ def import_activity(counter, activity):
 # import all activities into Strava
 counter_activities = 1
 for activity in activities:
+    # INFO: For debugging purposes
+    # print("[#{}] activity: {}".format(counter, activity))
     import_activity(counter_activities, activity)
     counter_activities += 1
