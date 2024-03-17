@@ -1,6 +1,6 @@
 echo "Building image dsue/runtastic-strava-migrate"
 echo "--------------------------------------------"
-docker build -t dsue/runtastic-strava-migrate .
+docker build -t dsue/runtastic-strava-migrate --load .
 echo ""
 
 echo "Migrating activities"
