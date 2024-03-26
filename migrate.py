@@ -43,25 +43,27 @@ def strava_activity_type(runtastic_type_id):
     }.get(int(runtastic_type_id), run)
 
 
-def metersPerSecondToKmPerHour(metersPerSecond):
+def metersPerSecondToKmPerHour(metersPerSecond: float):
     # km/h to m/s
     # 1m/s = (1km/1000) / (1h/(60*60))
     # m/s * 3.6 = km/h
     kilometersPerHour = float(metersPerSecond)*3.6
     return f'{kilometersPerHour:2.2f}'
 
-def convertToMinPerKm(secondsPerMeter):
-    secondsPerKilometer = float(secondsPerMeter) * 1000
-    return convertMinutesToFormattedString(secondsPerKilometer)
+def convertToMinPerKm(secondsPerMeter: float):
+    secondsPerKilometer = float(secondsPerMeter) * 1000.0
+    return convertSecondsToFormattedString(secondsPerKilometer)
 
-def convertToSeconds(milliseconds):
-    seconds = milliseconds/1000
-    return convertMinutesToFormattedString(seconds)
+def convertToSecondsString(milliseconds: int):
+    seconds = round(milliseconds/1000.0)
+    return convertSecondsToFormattedString(seconds)
 
-def convertMinutesToFormattedString(seconds):
-    min = int(seconds/60)
-    seconds = int(seconds%60)
-    return f'{min:02d}:{seconds:02d}'
+def convertSecondsToFormattedString(second: int):
+    s = int(second)
+    min = int(s/60)
+    seconds = s - min*60
+    result = f'{min:02d}:{seconds:02d}'
+    return result
 
 # map runtastic data to strava API request and make API call
 def import_activity(counter, activity):
@@ -75,6 +77,9 @@ def import_activity(counter, activity):
         if feature['type'] == "track_metrics":
             feeling = activity["subjective_feeling"] if (
                     "subjective_feeling" in activity) else "unknown"
+            pauseInMs = int(activity["pause"])
+            pauseString = (", pause: " + convertToSecondsString(pauseInMs) + " min") if (int(pauseInMs / 1000) > 0) else ""
+            
             data = {
                 "name": "{} ({})".format(activity_type, activity_date),
                 "type": activity_type,
@@ -87,7 +92,7 @@ def import_activity(counter, activity):
                 + ", max. speed: " + metersPerSecondToKmPerHour(feature["attributes"]["max_speed"]) + " km/h"
                 + ", elevation gain: " + str(feature["attributes"]["elevation_gain"]) + " m"
                 + ", elevation loss: " + str(feature["attributes"]["elevation_loss"]) + " m"
-                + ", pause: " + convertToSeconds(activity["pause"])
+                + pauseString
                 + ", calories: " + str(activity["calories"])
             }
             # INFO: For debugging purposes
